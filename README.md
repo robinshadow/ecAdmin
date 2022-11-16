@@ -31,7 +31,7 @@ cd vue-admin-template
 npm install
 
 # develop
-npm run dev
+npm run serve
 ```
 
 This will automatically open http://localhost:9528

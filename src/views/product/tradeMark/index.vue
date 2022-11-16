@@ -31,7 +31,8 @@
         <!-- 分页器 -->
         <el-pagination style="margin-top:20px;text-align:center" :current-page="page"
             @current-change="handleCurrentChange" :page-sizes="[3, 5, 10]" :page-size="limit"
-            @size-change="handleSizeChange" layout=" prev, pager, next, jumper, ->,sizes,total" :total="total">
+            @size-change="handleSizeChange" layout=" prev, pager, next, jumper, ->,sizes,total" :total="total"
+            v-show="total > 0">
         </el-pagination>
 
         <!-- 修改品牌对话框 -->

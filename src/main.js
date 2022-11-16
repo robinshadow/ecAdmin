@@ -25,6 +25,7 @@ Vue.prototype.$API = API
 import CategorySelector from '@/components/CategorySelector'
 Vue.component(CategorySelector.name, CategorySelector)
 
+
 Vue.config.productionTip = false
 
 new Vue({
