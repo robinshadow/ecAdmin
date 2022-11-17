@@ -154,49 +154,48 @@ export default {
         handleSuccess(response, file, fileList) {
             this.spuImgList = fileList
         },
-    },
-    //初始化SpuForm数据
-    async initSpuData(spu) {
-        //获取SPU信息
-        let spuInfo = await this.$API.spu.reqSpuInfo(spu.id)
-        if (spuInfo.code === 200) {
-            this.spuInfo = spuInfo.data
-        }
-        //获取品牌信息
-        let tradeMarkList = await this.$API.spu.reqTradeMarkList()
-        if (tradeMarkList.code === 200) {
-            this.tradeMarkList = tradeMarkList.data
-        }
-        //获取SPU图片
-        let spuImgList = await this.$API.spu.reqSpuImgList(spu.id)
-        if (spuImgList.code === 200) {
-            //处理图片数据，契合el-upload组件的file-list属性
-            let imgArr = spuImgList.data
-            imgArr.forEach(item => {
-                item.name = item.imgName
-                item.url = item.imgUrl
-            })
-            this.spuImgList = imgArr
-        }
-        //获取平台所有销售属性
-        let saleAttr = await this.$API.spu.reqBaseSaleAttrList()
-        if (saleAttr.code === 200) {
-            this.saleAttr = saleAttr.data
-        }
-    },
+        //初始化SpuForm数据
+        async initSpuData(spu) {
+            //获取SPU信息
+            let spuInfo = await this.$API.spu.reqSpuInfo(spu.id)
+            if (spuInfo.code === 200) {
+                this.spuInfo = spuInfo.data
+            }
+            //获取品牌信息
+            let tradeMarkList = await this.$API.spu.reqTradeMarkList()
+            if (tradeMarkList.code === 200) {
+                this.tradeMarkList = tradeMarkList.data
+            }
+            //获取SPU图片
+            let spuImgList = await this.$API.spu.reqSpuImgList(spu.id)
+            if (spuImgList.code === 200) {
+                //处理图片数据，契合el-upload组件的file-list属性
+                let imgArr = spuImgList.data
+                imgArr.forEach(item => {
+                    item.name = item.imgName
+                    item.url = item.imgUrl
+                })
+                this.spuImgList = imgArr
+            }
+            //获取平台所有销售属性
+            let saleAttr = await this.$API.spu.reqBaseSaleAttrList()
+            if (saleAttr.code === 200) {
+                this.saleAttr = saleAttr.data
+            }
+        },
 
-},
-computed: {
-    //计算出还未选择的销售属性
-    unSelectSaleAttr() {
-        let newArr = this.saleAttr.filter((item) => {
-            return this.spuInfo.spuSaleAttrList.every((saleAttr) => {
-                return item.name != saleAttr.saleAttrName
+    },
+    computed: {
+        //计算出还未选择的销售属性
+        unSelectSaleAttr() {
+            let newArr = this.saleAttr.filter((item) => {
+                return this.spuInfo.spuSaleAttrList.every((saleAttr) => {
+                    return item.name != saleAttr.saleAttrName
+                })
             })
-        })
-        return newArr
+            return newArr
+        }
     }
-}
 }
 </script>
 
