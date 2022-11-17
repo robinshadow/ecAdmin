@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-card style="margin:20px 0">
-            <CategorySelector @getCategory="getCategory" :show="isShow" />
+            <CategorySelector @getCategory="getCategory" :show="scene != 0" />
         </el-card>
 
         <el-card>
@@ -21,11 +21,22 @@
 
                     <el-table-column label="操作">
                         <template v-slot="{ row }">
-                            <el-button type="success" icon="el-icon-plus" size="mini" title="添加"></el-button>
-                            <el-button type="warning" icon="el-icon-edit" size="mini" title="编辑"
+
+                            <el-button type="success" icon="el-icon-plus" size="mini" title="添加Sku"
+                                @click="addSku(row)"></el-button>
+
+                            <el-button type="warning" icon="el-icon-edit" size="mini" title="修改Spu"
                                 @click="updateSpu(row)"></el-button>
+
                             <el-button type="info" icon="el-icon-info" size="mini" title="查看"></el-button>
-                            <el-button type="danger" icon="el-icon-delete" size="mini" title="删除"></el-button>
+
+
+                            <el-popconfirm title="这是一段内容确定删除吗？" @onConfirm="deleteSpu(row)">
+                                <el-button type="danger" icon="el-icon-delete" size="mini" title="删除" slot="reference"
+                                    style="margin:0 10px">
+                                </el-button>
+                            </el-popconfirm>
+
                         </template>
                     </el-table-column>
                 </el-table>
@@ -33,7 +44,7 @@
                 <!-- 分页器 -->
                 <el-pagination style="text-align: center;margin-top: 10px;" :current-page="page"
                     :page-sizes="[3, 5, 10]" :page-size="limit" layout="prev, pager, next, jumper,->, sizes,total"
-                    :total="total" v-show="total > 0" :pager-count="7" @size-change="handleSizeChange"
+                    :total="total" v-show="total > 0" :pager-count="5" @size-change="handleSizeChange"
                     @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
@@ -42,7 +53,7 @@
             <SpuForm v-show="scene == 1" @changeScene="changeScene" ref="spu" />
 
             <!-- 添加SKU -->
-            <SkuForm v-show="scene == 2" />
+            <SkuForm v-show="scene == 2" ref="sku" />
 
         </el-card>
 
@@ -64,8 +75,6 @@ export default {
             category1Id: '',
             category2Id: '',
             category3Id: '',
-            //控制分类选框的可操作性
-            isShow: false,
             page: 1, //分页器当前页数
             limit: 3, //分页器每页显示的条数
             records: [], //存储spu列表
@@ -111,6 +120,8 @@ export default {
         //添加spu
         addSpu() {
             this.scene = 1
+            //通知子组件发请求，并传递3id
+            this.$refs.spu.addSpuData(this.category3Id)
         },
         //修改spu
         updateSpu(row) {
@@ -119,13 +130,36 @@ export default {
             this.$refs.spu.initSpuData(row)
         },
         //SpuForm组件中取消按钮的自定义事件，用于切换场景值
-        changeScene() {
-            this.scene = 0
+        changeScene({ scene, flag }) {
+            this.scene = scene
+            if (flag == 'add') {
+                this.page = 1
+                this.getSpuList()
+            } else {
+                this.getSpuList()
+            }
+            this.getSpuList()
+        },
+        //删除spu
+        async deleteSpu(row) {
+            let result = await this.$API.spu.reqDeleteSpu(row.id)
+            if (result.code === 200) {
+                this.$message.success('删除成功')
+                if (this.records.length > 1) {
+                    this.getSpuList()
+                } else {
+                    this.page = this.page - 1
+                    this.getSpuList()
+                }
+            }
+        },
+        //添加sku
+        addSku(row) {
+            //切换场景
+            this.scene = 2
+            //获取子组件SkuForm，并调用子组件的方法发请求
+            this.$refs.sku.initSkuData(this.category1Id, this.category2Id, row)
         }
     }
 }
 </script>
-
-<style>
-
-</style>

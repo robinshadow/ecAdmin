@@ -108,7 +108,9 @@ export default {
                 attrValueList: [],//属性值列表
                 categoryId: 0, //三级分类id
                 categoryLevel: 3
-            }
+            },
+            //属性值是否重复
+            repeat: false,
         }
     },
     methods: {
@@ -186,15 +188,18 @@ export default {
             let isRepeat = this.attrInfo.attrValueList.some((item) => {
                 //排除row本身
                 if (row !== item) {
-                    return row.valueName == item.valueName
+                    return row.valueName.trim() == item.valueName.trim()
                 }
             })
+            this.repeat = isRepeat
             if (!row.valueName.trim()) {
                 this.$message.error('属性值不能为空')
                 row.flag = true
+                return
             } else if (isRepeat) {
                 this.$message.error('属性值不能重复')
                 row.flag = true
+                return
             } else {
                 row.flag = false
             }
@@ -235,6 +240,9 @@ export default {
                 return
             } else if (isEmpty) {
                 this.$message.error('属性值不能为空')
+                return
+            } else if (this.repeat) {
+                this.$message.error('属性值不能重复')
                 return
             } else {
                 try {
