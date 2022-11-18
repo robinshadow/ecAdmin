@@ -251,7 +251,7 @@ export default {
             if (result.code === 200) {
                 this.$message.success('保存成功')
                 //回到scene==0,并区分修改和添加
-                this.$emit('changeScene', { scene: 0, flag: this.spuInfo.id ? 'update' : 'add' })
+                this.$emit('SpuFormChangeScene', { scene: 0, flag: this.spuInfo.id ? 'update' : 'add' })
             }
             //清除输入的数据
             Object.assign(this._data, this.$options.data())
@@ -274,7 +274,7 @@ export default {
         //取消按钮回调
         cancel() {
             //切换场景
-            this.$emit('changeScene', { scene: 0, flag: '' })
+            this.$emit('SpuFormChangeScene', { scene: 0, flag: '' })
             //清除输入的数据
             Object.assign(this._data, this.$options.data())
         }

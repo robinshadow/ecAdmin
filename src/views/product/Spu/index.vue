@@ -50,10 +50,10 @@
             </div>
 
             <!-- 添加或修改SPU -->
-            <SpuForm v-show="scene == 1" @changeScene="changeScene" ref="spu" />
+            <SpuForm v-show="scene == 1" @SpuFormChangeScene="SpuFormChangeScene" ref="spu" />
 
             <!-- 添加SKU -->
-            <SkuForm v-show="scene == 2" ref="sku" />
+            <SkuForm v-show="scene == 2" @SkuFormChangeScene="SkuFormChangeScene" ref="sku" />
 
         </el-card>
 
@@ -130,7 +130,7 @@ export default {
             this.$refs.spu.initSpuData(row)
         },
         //SpuForm组件中取消按钮的自定义事件，用于切换场景值
-        changeScene({ scene, flag }) {
+        SpuFormChangeScene({ scene, flag }) {
             this.scene = scene
             if (flag == 'add') {
                 this.page = 1
@@ -159,6 +159,10 @@ export default {
             this.scene = 2
             //获取子组件SkuForm，并调用子组件的方法发请求
             this.$refs.sku.initSkuData(this.category1Id, this.category2Id, row)
+        },
+        //SkuForm组件中取消按钮的自定义事件，用于切换场景值
+        SkuFormChangeScene(scene) {
+            this.scene = scene
         }
     }
 }
