@@ -8,7 +8,7 @@
             <!-- 底部 展示SPU -->
             <div v-show="scene == 0">
                 <el-button type="primary" icon="el-icon-plus" :disabled="!category3Id" @click="addSpu">添加SPU</el-button>
-                <el-table border :data="records" style="margin:10px 0">
+                <el-table border :data="records" style="margin:10px 0" v-loading="mainLoading">
                     <el-table-column label="序号" type="index" align="center" width="80px">
                     </el-table-column>
 
@@ -28,7 +28,8 @@
                             <el-button type="warning" icon="el-icon-edit" size="mini" title="修改Spu"
                                 @click="updateSpu(row)"></el-button>
 
-                            <el-button type="info" icon="el-icon-info" size="mini" title="查看"></el-button>
+                            <el-button type="info" icon="el-icon-info" size="mini" title="查看当前SPU的全部SKU"
+                                @click="viewSku(row)"></el-button>
 
 
                             <el-popconfirm title="这是一段内容确定删除吗？" @onConfirm="deleteSpu(row)">
@@ -56,6 +57,19 @@
             <SkuForm v-show="scene == 2" @SkuFormChangeScene="SkuFormChangeScene" ref="sku" />
 
         </el-card>
+        <!-- SKU列表信息对话框 -->
+        <el-dialog :title='`${spu.spuName}的SKU列表`' :visible.sync="dialogTableVisible" :before-close="closeDialog">
+            <el-table :data="skuList" border v-loading="loading">
+                <el-table-column label="名称" prop="skuName"></el-table-column>
+                <el-table-column label="价格" prop="price"></el-table-column>
+                <el-table-column label="重量" prop="weight"></el-table-column>
+                <el-table-column label="默认图片">
+                    <template v-slot="{ row }">
+                        <img :src="row.skuDefaultImg" width="100px" height="100px">
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
 
     </div>
 </template>
@@ -71,6 +85,8 @@ export default {
     },
     data() {
         return {
+            //SPU主表格loading动画
+            mainLoading: false,
             //三级分类id
             category1Id: '',
             category2Id: '',
@@ -80,6 +96,10 @@ export default {
             records: [], //存储spu列表
             total: 0, //数据总条数
             scene: 0, //场景值,控制底部三个div的显示隐藏，0:展示SPU,1:添加或修改SPU,2:添加SKU
+            dialogTableVisible: false, //控制SKU列表信息对话框显示与隐藏
+            spu: {},  //存储当前点击的spu信息
+            skuList: [],//存储当前点击的spu的sku列表信息
+            loading: true,//加载中
         }
     },
     methods: {
@@ -99,12 +119,14 @@ export default {
         },
         //获取spu列表
         async getSpuList() {
+            this.mainLoading = true
             const { page, limit, category3Id } = this
             let result = await this.$API.spu.reqSpuList(page, limit, category3Id)
             if (result.code === 200) {
                 this.total = result.data.total
                 this.records = result.data.records
-
+                //隐藏loading动画
+                this.mainLoading = false
             }
         },
         //分页器页码发生变化时的回调
@@ -163,7 +185,27 @@ export default {
         //SkuForm组件中取消按钮的自定义事件，用于切换场景值
         SkuFormChangeScene(scene) {
             this.scene = scene
-        }
+        },
+        //查看sku
+        async viewSku(row) {
+            //显示表格对话框
+            this.dialogTableVisible = true
+            //保存当前点击的spu信息
+            this.spu = row
+            //获取sku列表数据
+            let result = await this.$API.spu.reqSkuList(row.id)
+            if (result.code === 200) {
+                this.skuList = result.data
+                //关闭加载中
+                this.loading = false
+            }
+        },
+        //关闭对话框回调
+        closeDialog(done) {
+            this.loading = true
+            this.skuList = []
+            done()
+        },
     }
 }
 </script>

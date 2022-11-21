@@ -100,27 +100,27 @@ export default {
                 weight: '',
                 skuDesc: '',     //规格描述
                 skuAttrValueList: [
-                    {
+                    /* {
                         "attrId": 0,
                         "valueId": 0,
-                    }
+                    } */
                 ],
                 //默认图片
                 skuDefaultImg: '',
                 //图片列表
                 skuImageList: [
-                    {
+                    /* {
                         "id": 0,
                         "imgName": "string",
                         "imgUrl": "string",
                         "isDefault": "string",
                         "skuId": 0,
                         "spuImgId": 0
-                    }
+                    } */
                 ],
                 //销售属性
                 skuSaleAttrValueList: [
-                    {
+                    /* {
                         "id": 0,
                         "saleAttrId": 0,
                         "saleAttrName": "string",
@@ -128,7 +128,7 @@ export default {
                         "saleAttrValueName": "string",
                         "skuId": 0,
                         "spuId": 0
-                    }
+                    } */
                 ],
             }
         }
@@ -182,14 +182,39 @@ export default {
             Object.assign(this._data, this.$options.data())
         },
         //保存按钮回调
-        save() {
-            //整理数据
+        async save() {
+            //整理平台属性数据
             this.attrInfoList.forEach((item) => {
                 if (item.attrIdAndValId) {
+                    //切割数据
                     const [attrId, valueId] = item.attrIdAndValId.split(':')
-                    let obj = { attrId, valueId }
+                    this.skuInfo.skuAttrValueList.push({ attrId, valueId })
                 }
             })
+            //整理销售属性数据
+            this.skuInfo.skuSaleAttrValueList = this.saleAttrList.reduce((pre, item) => {
+                if (item.attrIdAndValId) {
+                    const [saleAttrId, saleAttrValueId] = item.attrIdAndValId.split(':')
+                    pre.push({ saleAttrId, saleAttrValueId })
+                }
+                return pre
+            }, [])
+            //整理图片数据
+            this.skuInfo.skuImageList = this.imgList.map(item => {
+                return {
+                    imgName: item.imgName,
+                    imgUrl: item.imgUrl,
+                    isDefault: item.isDefault,
+                    spuImgId: item.id
+                }
+            })
+            //发请求
+            let result = await this.$API.spu.reqAddSku(this.skuInfo)
+            if (result.code === 200) {
+                this.$message.success('添加成功')
+                //通知父组件切换场景并清除数据
+                this.cancel()
+            }
         }
     }
 }

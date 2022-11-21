@@ -4,19 +4,22 @@
         <el-form :inline="true" class="demo-form-inline" :model="cForm">
 
             <el-form-item label="一级分类">
-                <el-select placeholder="请选择" v-model="cForm.category1Id" @change="get2Id" :disabled="show">
+                <el-select placeholder="请选择" v-model="cForm.category1Id" @change="get2Id" :disabled="show"
+                    v-loading="loading1">
                     <el-option :label="c1.name" :value="c1.id" v-for="c1 in list1" :key="c1.id"></el-option>
                 </el-select>
             </el-form-item>
 
             <el-form-item label="二级分类">
-                <el-select placeholder="请选择" v-model="cForm.category2Id" @change="get3Id" :disabled="show">
+                <el-select placeholder="请选择" v-model="cForm.category2Id" @change="get3Id" :disabled="show"
+                    v-loading="loading2">
                     <el-option :label="c2.name" :value="c2.id" v-for="c2 in list2" :key="c2.id"></el-option>
                 </el-select>
             </el-form-item>
 
             <el-form-item label="三级分类">
-                <el-select placeholder="请选择" v-model="cForm.category3Id" @change="handler" :disabled="show">
+                <el-select placeholder="请选择" v-model="cForm.category3Id" @change="handler" :disabled="show"
+                    v-loading="loading3">
                     <el-option :label="c3.name" :value="c3.id" v-for="c3 in list3" :key="c3.id"></el-option>
                 </el-select>
             </el-form-item>
@@ -41,7 +44,13 @@ export default {
                 category1Id: '',
                 category2Id: '',
                 category3Id: ''
-            }
+            },
+            //1ID加载动画
+            loading1: false,
+            //2ID加载动画
+            loading2: false,
+            //3ID加载动画
+            loading3: false
         }
     },
     mounted() {
@@ -58,6 +67,8 @@ export default {
         },
         //获取二级分类数据
         async get2Id() {
+            this.loading2 = true
+            this.loading3 = true
             //先清除之前的数据
             this.list3 = []
             this.cForm.category2Id = ''
@@ -66,6 +77,7 @@ export default {
             let result = await this.$API.attr.reqGetCategory2List(this.cForm.category1Id)
             if (result.code === 200) {
                 this.list2 = result.data
+                this.loading2 = false
             }
             //给父组件传1id
             const { category1Id } = this.cForm
@@ -73,12 +85,14 @@ export default {
         },
         //获取三级分类数据
         async get3Id() {
+            this.loading3 = true
             //清除数据
             this.list3 = []
             this.cForm.category3Id = ''
             let result = await this.$API.attr.reqGetCategory3List(this.cForm.category2Id)
             if (result.code === 200) {
                 this.list3 = result.data
+                this.loading3 = false
             }
             //给父组件传2id
             const { category2Id } = this.cForm

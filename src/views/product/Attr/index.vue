@@ -11,7 +11,7 @@
                 </el-button>
 
                 <!-- 展示售卖属性表格 -->
-                <el-table border :data="attrList" style="margin:10px 0">
+                <el-table border :data="attrList" style="margin:10px 0" v-loading="loading">
                     <el-table-column type="index" label="序号" width="80px" align="center">
                     </el-table-column>
 
@@ -111,17 +111,20 @@ export default {
             },
             //属性值是否重复
             repeat: false,
+            //loading动画
+            loading: false,
         }
     },
     methods: {
         //发请求获得品牌属性
         async getAttrList() {
+            this.loading = true
             const { category1Id, category2Id, category3Id } = this
             let result = await this.$API.attr.reqAttrList(category1Id, category2Id, category3Id)
             if (result.code === 200) {
                 this.attrList = result.data
+                this.loading = false
             }
-
         },
         //自定义事件，拿到子组件三级分类选框的三个id并储存在组件身上
         getCategory({ categoryId, level }) {

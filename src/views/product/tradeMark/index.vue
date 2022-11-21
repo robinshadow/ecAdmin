@@ -4,7 +4,7 @@
         <el-button type="primary" icon="el-icon-plus" style="margin:10px 0" @click="showDialog">添加</el-button>
 
         <!-- 展示数据的表格 -->
-        <el-table style="width: 100%" border :data="list">
+        <el-table style="width: 100%" border :data="list" v-loading="loading">
             <el-table-column prop="date" label="序号" width="80px" align="center" type="index">
             </el-table-column>
             <el-table-column prop="tmName" label="品牌名称">
@@ -72,6 +72,8 @@ export default {
     name: 'tradeMark',
     data() {
         return {
+            //loading动画
+            loading: true,
             //分页器当前页数
             page: 1,
             //一页展示数据条数
@@ -113,6 +115,8 @@ export default {
                 //展示数据总条数和列表展示的数据
                 this.total = result.data.total
                 this.list = result.data.records
+                //隐藏loading动画
+                this.loading = false
             }
         },
         //当前页码发生变化回调
