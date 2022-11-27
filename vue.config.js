@@ -39,9 +39,8 @@ module.exports = {
     },
     //配置代理服务器,解决跨域问题
     proxy: {
-      '/dev-api': {
+      '/admin': {
         target: 'http://gmall-h5-api.atguigu.cn',
-        pathRewrite: { '^/dev-api': '/' }
       }
     }
   },
